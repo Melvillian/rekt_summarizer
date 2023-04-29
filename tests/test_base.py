@@ -1,5 +1,5 @@
-from project_name.base import NAME
+from rekt_summarizer.base import NAME
 
 
 def test_base():
-    assert NAME == "project_name"
+    assert NAME == "rekt_summarizer"
