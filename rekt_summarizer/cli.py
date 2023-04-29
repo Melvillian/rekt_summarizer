@@ -8,6 +8,9 @@ Be creative! do whatever you want!
 - Import things from your .base module
 """
 
+from .base import main as task  # pragma: no cover
+
+
 
 def main():  # pragma: no cover
     """
@@ -25,4 +28,15 @@ def main():  # pragma: no cover
         * List all available tasks
         * Run an application (Flask, FastAPI, Django, etc.)
     """
-    print("This will do something")
+    print("Beginning...")
+
+    # TODO: make this a generic webscraper with some random time delay to avoid getting blocked
+    urls = [
+        "https://rekt.news/merlin-dex-rekt/",
+        # Add more URLs if needed
+    ]
+
+
+    task(urls)
+
+    print("Done!")
