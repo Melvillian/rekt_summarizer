@@ -1,4 +1,3 @@
-import sys
 import requests
 from bs4 import BeautifulSoup
 import html2text
@@ -23,37 +22,56 @@ def convert_to_markdown(html):
     converter.ignore_links = False
     return converter.handle(html)
 
-def main(urls):
+def url_to_markdown(url):
+    html = fetch_html(url)
+    if html is None:
+        print(f"Error fetching HTML from {url}")
+        return None
+    article_html = extract_article(html)
+    if not article_html:
+        print(f"No article found at URL: {url}")
+        return None
 
-    # TODO: refactor into its own function
+    markdown = convert_to_markdown(article_html)
+    return markdown
+
+def batch_url_to_markdowns(urls):
     raw_markdowns = []
     for url in urls:
-        html = fetch_html(url)
-        if html is None:
-            continue
-
-        article_html = extract_article(html)
-        if not article_html:
-            print(f"No article found at URL: {url}")
-            continue
-
-        markdown = convert_to_markdown(article_html)
-        print("OUTPUT:")
-        print(markdown)
-        print("END\n")
+        markdown = url_to_markdown(url)
         raw_markdowns.append(markdown)
 
+    return raw_markdowns
 
-    # TODO
+def extract_main_article_text(markdowns):
+
+    sep = '## SUBSCRIBE NOW'
+
+    article_markdown = []
+    for markdown in markdowns:
+        split_markdown = markdown.split(sep, 1)
+        if len(split_markdown) != 2:
+            print(f"Multiple SUBSCRIBE NOWs in: {url}")
+            return None
+        text = split_markdown[0]
+        article_markdown.append(text)
+    return article_markdown
+
+def main(urls):
+
+    raw_markdowns = batch_url_to_markdowns(urls)
+
     markdowns = extract_main_article_text(raw_markdowns)
 
-    # TODO
-    (categories, backlinks) = categorize_markdowns_with_backlinks(markdowns)
+    print(markdowns[0])
 
-    print("CATEGORIES:")
-    print(categories)
-    print("BACKLINKS:")
-    print(backlinks)
+    # TODO
+    # (categories, backlinks) = categorize_markdowns_with_backlinks(markdowns)
+
+    # print("CATEGORIES:")
+    # print(categories)
+    # print("BACKLINKS:")
+    # print(backlinks)
 
 if __name__ == "__main__":
     urls = [
