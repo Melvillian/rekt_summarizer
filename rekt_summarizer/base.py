@@ -124,7 +124,7 @@ def article_url_to_filepath(url):
     """
 
     filename_without_extension = url.split(".news/", 1)[1].replace("/", "").replace("-", "_")
-    filepath = os.path.join(MARKDOWN_DIRECTORY, f"{filename_without_extension}.txt")
+    filepath = os.path.join(MARKDOWN_DIRECTORY, f"{filename_without_extension}.md")
     return filepath
     
 
