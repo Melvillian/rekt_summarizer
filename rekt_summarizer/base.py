@@ -131,7 +131,7 @@ def article_url_to_filepath(url):
 def single_write_markdown_to_file(url, text_content):
     filepath = article_url_to_filepath(url)
 
-    # do not bother creating the file if it already exists
+    # only create the file if it doesn't already exist
     if not os.path.exists(filepath):
         with open(filepath, "w") as file:
             file.write(text_content)
