@@ -1,6 +1,7 @@
 import requests
 import os
 import time
+import glob
 from bs4 import BeautifulSoup
 import html2text
 
@@ -126,7 +127,7 @@ def article_url_to_filepath(url):
     to "ronin_rekt"
     """
 
-    filename_without_extension = url.split(".news/", 1)[1].replace("/", "").replace("-", "_")
+    filename_without_extension = url.split(".news/", 1)[1].replace("/", "")
     filepath = os.path.join(MARKDOWN_DIRECTORY, f"{filename_without_extension}.md")
     return filepath
     
@@ -160,11 +161,24 @@ def main(urls):
         (url, markdown) = single_cleanup_markdown_text(url, raw_markdown)
         single_write_markdown_to_file(url, markdown)
 
-    # raw_markdowns_and_urls = batch_url_to_markdowns(urls)
+    raw_markdowns_and_urls = batch_url_to_markdowns(urls)
 
-    # article_markdown_and_urls = batch_cleanup_markdown_text(raw_markdowns_and_urls)
+    article_markdown_and_urls = batch_cleanup_markdown_text(raw_markdowns_and_urls)
 
-    # batch_write_markdowns_to_files(article_markdown_and_urls)
+    batch_write_markdowns_to_files(article_markdown_and_urls)
+
+    # gather filepaths and loop through summarizing them
+    markdown_filepaths = glob.glob(os.path.join(MARKDOWN_DIRECTORY, "*.md"))
+
+    for filepath in markdown_filepaths:
+        with open(filepath, "r") as file:
+            markdown = file.read()
+
+            print(filepath)
+            summarize(markdown)
+            break
+
+
     
     # TODO
     # (categories, backlinks) = categorize_markdowns_with_backlinks(markdowns)

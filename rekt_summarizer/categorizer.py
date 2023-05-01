@@ -1,5 +1,9 @@
 import os
 import openai
+import ast
+from dotenv import load_dotenv
+
+load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -7,7 +11,7 @@ prompt_prefix = """You are the author of rekt.news, who has written all of the a
 
 You have been tasked with classifying the type of attack (or attacks, if a single article discusses multiple categories in a single article) discussed in each of the rekt.news articles.
 
-Here is an example, where the article text will be prefixed with "ARTICLE TEXT:\n" and the categories for that article will be prefixed with "CATEGORIES:\n", and both will be suffixed with "END\n":
+Here is an example, where the article text will be prefixed with "ARTICLE TEXT:\n" and the categories are a single array of string categories (each surrounded by double quotes):
 
 ARTICLE TEXT:
 $1.8M disappeared in a puff of smoke as Merlin pulled the classic DeFi magic trick.
@@ -39,11 +43,9 @@ And when many protocols have centralisation issues which could potentially lead 
 Where does the blame really lie?
 END
 
-CATEGORIES:
 ["rugpull"]
-END
 
-Here is another example of a rekt.news article (prefixed by "ARTICLE TEXT:\n") followed by the correct categories for that article (prefixed by "CATEGORIES:\n" and suffixed by "END\n"):
+Here is another example of a rekt.news article (prefixed by "ARTICLE TEXT:\n") followed by the correct categories array:
 
 ARTICLE TEXT:
 Hundred Finance finally gets its very own article.
@@ -127,10 +129,9 @@ Today we are launching a $500k reward in the hope that this provides additional 
 Hopefully the added pressure is as effective in recovering the funds…
 
 Will Hundred get lucky?
-
-CATEGORIES:
-["flashloan_exploit", "contract_manipulation", "reentrancy_attack"]
 END
+
+["flashloan_exploit", "contract_manipulation", "reentrancy_attack"]
 
 Here is one last example of article followed by the categories:
 
@@ -202,12 +203,11 @@ First Sushi, now Yearn.
 It's a big week for DeFi stalwarts getting rekt.
 
 Who will be next?
-
-CATEGORIES:
-["misconfiguration_exploit", "contract_manipulation"]
 END
 
-Now, I want you to summarize the following article, which will be prefixed with "ARTICLE TEXT:\n" and end with "END\n", and I want you to respond with a single array of string categories (surrounded by double quotes), which will be prefixed with "CATEGORIES:\n", and end with "END\n".
+["misconfiguration_exploit", "contract_manipulation"]
+
+Now, I want you to summarize the following article, which will be prefixed with "ARTICLE TEXT:\n" and end with "END\n", and I want you to respond with a single array of string categories (surrounded by double quotes):
 
 ARTICLE TEXT:
 {markdown}
@@ -217,13 +217,17 @@ END
 
 def summarize(markdown):
 
-    resp = openai.Completion.create(
+    resp = openai.ChatCompletion.create(
         model="gpt-4",
-        prompt=prompt_prefix.format(markdown=markdown),
-        max_tokens=4096,
-        temperature=0.2
+        messages=[{"role": "user", "content": prompt_prefix.format(markdown=markdown)}],
     )
 
-    print(resp)
-    categories = resp.data.categories
+    if not resp.choices or len(resp.choices) != 1:
+        print(f"ERROR: {resp}")
+        raise Exception("unexpected response from OpenAI API")
+
+    # convert string ["rugpull"] to an actual Python list
+    categories_as_string = resp.choices[0].message.content
+    categories = ast.literal_eval(categories_as_string)
+
     return categories
