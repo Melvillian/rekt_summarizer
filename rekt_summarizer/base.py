@@ -223,27 +223,28 @@ def main():
 
                     backlinks[category].append(article_url)
 
+            # TODO: intermediate print these for debugging purposes, delete when no longer needed
+            # print the categories and their counts
+            print("CATEGORIES:")
+            print(categories)
+
+            print("BACKLINKS:")
+            print(backlinks)
+
             # sleep for 10 seconds to avoid hitting the OPENAI API rate limit
             # This calculation is based on an average of 24.5 tokens per minute
             # and the rate limit is 40k tokens per minute
             time.sleep(10)
     
-    # print the categories and their counts
-    print("CATEGORIES:")
-    print(categories)
-
-    print("BACKLINKS:")
-    print(backlinks)
-
     result = {
-        categories: categories,
-        backlinks: backlinks
+        'categories': categories,
+        'backlinks': backlinks
     }
     
     print(result)
 
     # Pickling the result so the streamlit app can use it
-    with open('summarization_results.pkl', 'wb') as file:
+    with open(f"{DATA_DIRECTORY}/summarization_results.pkl", 'wb') as file:
         pickle.dump(result, file)
 
 if __name__ == "__main__":

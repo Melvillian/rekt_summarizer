@@ -1,6 +1,9 @@
 import os
 import openai
 import ast
+import requests
+import time
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -222,10 +225,25 @@ def infer_categories_from_article(markdown, old_categories):
 
     # infer categories for this article from OpenAI API
     prompt = prompt_prefix.format(markdown=markdown, old_categories=old_categories)
-    resp = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-    )
+    resp = {}
+
+    counter = 0
+
+    while True:
+        if counter >= 3:
+            # we've tried 3 times, let's just give up
+            raise Exception("Something is wrong with openai, timing out")
+        try:
+            resp = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+            )
+            break
+        except requests.exceptions.RequestException as e:
+            print(f"OPENAI Error: {e}")
+            time.sleep(20)
+            counter = counter + 1
+
     if not resp.choices or len(resp.choices) != 1:
         print(f"ERROR: {resp}")
         raise Exception("unexpected response from OpenAI API")

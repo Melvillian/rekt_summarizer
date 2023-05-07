@@ -5,6 +5,8 @@
 import streamlit as st
 import pickle
 
+DATA_DIRECTORY = "rekt_summarizer/data"
+
 # e.g: 
 # categories_and_backlinks = {
 #   'categories': {
@@ -18,7 +20,7 @@ import pickle
 # }
 
 categories_and_backlinks = {}
-with open('summarization_results.pkl', 'rb') as file:
+with open(f"{DATA_DIRECTORY}/summarization_results.pkl", 'rb') as file:
     categories_and_backlinks = pickle.load(file)
 
 st.title('rekt.news Leaderboard hack count by category')
