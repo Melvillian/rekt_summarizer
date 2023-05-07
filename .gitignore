@@ -132,4 +132,4 @@ dmypy.json
 .github/templates/*
 
 # markdown data that we store to reduce load on rekt.news
-rekt_summarizer/markdown_data/*.md
+rekt_summarizer/data/rekt_news_markdown/*.md

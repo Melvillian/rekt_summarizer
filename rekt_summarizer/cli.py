@@ -30,13 +30,6 @@ def main():  # pragma: no cover
     """
     print("Beginning...")
 
-    # TODO: make this a generic webscraper with some random time delay to avoid getting blocked
-    urls = [
-        "https://rekt.news/merlin-dex-rekt/",
-        # Add more URLs if needed
-    ]
-
-
-    task(urls)
+    task()
 
     print("Done!")

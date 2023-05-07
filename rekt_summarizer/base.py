@@ -4,13 +4,15 @@ import time
 import glob
 from bs4 import BeautifulSoup
 import html2text
+import pickle
 
 from .categorizer import infer_categories_from_article  # pragma: no cover
 
 
 REKT_NEWS_BASE_URL = "https://rekt.news"
 REKT_NEWS_PAGINATION_URL = "https://rekt.news/?page={index}"
-MARKDOWN_DIRECTORY = "rekt_summarizer/markdown_data"
+DATA_DIRECTORY = "rekt_summarizer/data"
+MARKDOWN_DIRECTORY = f"{DATA_DIRECTORY}/rekt_news_markdown"
 
 def fetch_html(url):
     try:
@@ -151,7 +153,7 @@ def batch_write_markdowns_to_files(article_markdown_and_urls):
         single_write_markdown_to_file(url, text_content)
 
 def get_article_url(filepath):
-    # filepath = "rekt_summarizer/markdown_data/eminence-rekt-in-prod.md"
+    # filepath = "rekt_summarizer/data/rekt_news_markdown/eminence-rekt-in-prod.md"
     article_md_file = filepath.split(MARKDOWN_DIRECTORY, 1)[1]
     # article_md_file = "/eminence-rekt-in-prod.md"
     article_name = article_md_file[:-3]
@@ -207,21 +209,21 @@ def main():
             for category in article_categories:
                 article_url = get_article_url(filepath)
                 article_urls_for_category = backlinks.get(category)
-                                
-                # to be extra sure, check to make sure we don't have any duplicate
-                # categories for a given hack. An AssertionError here would mean
-                # that GPT is creating category arrays with duplicate categories
-                # which we don't want
-                if article_url in article_urls_for_category:
-                    raise AssertionError(f"Duplicate category for article {article_url} and category {category}")
 
                 # update backlinks
                 if article_urls_for_category is None:
                     backlinks[category] = [article_url]
                 else:
+                    # to be extra sure, check to make sure we don't have any duplicate
+                    # categories for a given hack. An AssertionError here would mean
+                    # that GPT is creating category arrays with duplicate categories
+                    # which we don't want
+                    if article_url in article_urls_for_category:
+                        raise AssertionError(f"Duplicate category for article {article_url} and category {category}")
+
                     backlinks[category].append(article_url)
 
-            # sleep for 10 seconds to avoid hitting the API rate limit
+            # sleep for 10 seconds to avoid hitting the OPENAI API rate limit
             # This calculation is based on an average of 24.5 tokens per minute
             # and the rate limit is 40k tokens per minute
             time.sleep(10)
@@ -237,8 +239,12 @@ def main():
         categories: categories,
         backlinks: backlinks
     }
-
+    
     print(result)
+
+    # Pickling the result so the streamlit app can use it
+    with open('summarization_results.pkl', 'wb') as file:
+        pickle.dump(result, file)
 
 if __name__ == "__main__":
     main()

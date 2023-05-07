@@ -18,6 +18,8 @@ pip install -r requirements.txt
 
 ## Usage
 
+### Category and Backlink Generation
+
 ```bash
 $ python -m rekt_summarizer
 #or
@@ -26,31 +28,25 @@ $ rekt_summarizer
 
 This will:
 1. Fetch the rekt.news articles listed in their [leaderboard](https://rekt.news/leaderboard/)
-2. Convert the HTML articles to markdown and store them in [rekt_summarizer/markdown_data/](./rekt_summarizer/markdown_data/)
+2. Convert the HTML articles to markdown and store them in [rekt_summarizer/data/rekt_news_markdown/](./rekt_summarizer/data/rekt_news_markdown/)
 3. Use OpenAI to categorize the hacks involved in each article such the script prints a dict of the form:
 
 
 ```js
 {
-  categories: {
-    contract_manipulation: 75,
-    reentrancy_attack: 30,
-    ...
+  'categories': {
+    'contract_manipulation': 75,
+    'reentrancy_attack': 30,
   },
-  backlinks: {
-    merlin3_rekt: {
-      url: "https://rekt.news/merlin3-rekt/",
-      categories: [
-        "contract_manipulation"
-      ]
-    },
-    safedollar_rekt: {
-      url: "https://rekt.news/safedollar-rekt/",
-      categories: [
-        "polygon",
-        "contract_manipulation"
-      ]
-    },
-    ...
+  'backlinks': {
+    'contract_manipulation': ["https://rekt.news/merlin3-rekt/", "https://rekt.news/beanstalk-rekt/"],
+    'human_error': ["https://rekt.news/ronin-rekt/", "https://rekt.news/beanstalk-rekt/"], "rugpull": ["https://rekt.news/ronin-rekt/"]
   }
 }
+```
+
+### Streamlit Data Visualizer
+
+```bash
+streamlit run app.py
+```
