@@ -208,17 +208,20 @@ END
 
 ["misconfiguration_exploit", "contract_manipulation"]
 
-Now, I want you to summarize the following article, which will be prefixed with "ARTICLE TEXT:\n" and end with "END\n", and I want you to respond with a single array of string categories (surrounded by double quotes):
+Now, I want you to summarize the following article, which will be prefixed with "ARTICLE TEXT:\n" and end with "END\n", and I want you to take the category dictionary into account when choosing the category array for this article. The categories will be a Python dict enclose by "---" before and after. In yoru answer I want you to respond with a single array of string categories (surrounded by double quotes):
 
 ARTICLE TEXT:
 {markdown}
 END
 
+---
+{old_categories}
+---
 """
 
-def summarize(markdown):
+def summarize(markdown, old_categories):
 
-    prompt = prompt_prefix.format(markdown=markdown)
+    prompt = prompt_prefix.format(markdown=markdown, old_categories=old_categories)
     resp = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[{"role": "user", "content": prompt}],
@@ -230,8 +233,8 @@ def summarize(markdown):
 
     # convert string ["rugpull"] to an actual Python list
     categories_as_string = resp.choices[0].message.content
-    categories = ast.literal_eval(categories_as_string)
-    if categories is None:
+    new_categories = ast.literal_eval(categories_as_string)
+    if new_categories is None:
         raise Exception(f"unable to parse categories string {categories_as_string}")
 
-    return categories
+    return new_categories

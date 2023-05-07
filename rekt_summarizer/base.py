@@ -179,13 +179,7 @@ def main(urls):
             markdown = file.read()
 
             print(filepath)
-            hacks_for_this_category = summarize(markdown)
-
-            print("Hack categories for this article:")
-            print(hacks_for_this_category)
-
-            print("BEFORE:")
-            print(categories)
+            hacks_for_this_category = summarize(markdown, categories)
 
             # this article had some hacks, let's update the category dict by incrementing
             # the count for each hack
@@ -196,17 +190,15 @@ def main(urls):
                 else:
                     categories[hack] = hack_count + 1
 
-            print("AFTER:")
-            print(categories)
-
-                
             # sleep for 10 seconds to avoid hitting the API rate limit
             # This calculation is based on an average of 24.5 tokens per minute
             # and the rate limit is 40k tokens per minute
             time.sleep(10)
-
-
     
+    # print the categories and their counts
+    print("CATEGORIES:")
+    print(categories)
+
     # TODO
     # (categories, backlinks) = categorize_markdowns_with_backlinks(markdowns)
 
