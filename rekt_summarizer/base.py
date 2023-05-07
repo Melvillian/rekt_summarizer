@@ -5,7 +5,7 @@ import glob
 from bs4 import BeautifulSoup
 import html2text
 
-from .categorizer import summarize  # pragma: no cover
+from .categorizer import infer_categories_from_article  # pragma: no cover
 
 
 REKT_NEWS_BASE_URL = "https://rekt.news"
@@ -150,7 +150,16 @@ def batch_write_markdowns_to_files(article_markdown_and_urls):
     for url, text_content in article_markdown_and_urls:
         single_write_markdown_to_file(url, text_content)
 
-def main(urls):
+def get_article_url(filepath):
+    # filepath = "rekt_summarizer/markdown_data/eminence-rekt-in-prod.md"
+    article_md_file = filepath.split(MARKDOWN_DIRECTORY, 1)[1]
+    # article_md_file = "/eminence-rekt-in-prod.md"
+    article_name = article_md_file[:-3]
+    # article_name = "/eminence-rekt-in-prod"
+    article_url = REKT_NEWS_BASE_URL + article_name
+    return article_url
+
+def main():
     urls = extract_article_urls_from_leaderboard_page("https://rekt.news/leaderboard/")
 
     for url in urls:
@@ -174,21 +183,43 @@ def main(urls):
     # e.g.: { "human_error": 5, "rugpull": 2 }
     categories = {}
 
+    # stores the mapping between categories and the articles that categories were inferred from
+    # e.g.: { "human_error": ["https://rekt.news/ronin-rekt/", "https://rekt.news/beanstalk-rekt/"], "rugpull": ["https://rekt.news/ronin-rekt/"] }
+    backlinks = {}
+
     for filepath in markdown_filepaths:
         with open(filepath, "r") as file:
             markdown = file.read()
 
             print(filepath)
-            hacks_for_this_category = summarize(markdown, categories)
+            article_categories = infer_categories_from_article(markdown, categories)
 
-            # this article had some hacks, let's update the category dict by incrementing
+            # if this article had some hack categories, let's update the category dict by incrementing
             # the count for each hack
-            for hack in hacks_for_this_category:
-                hack_count = categories.get(hack)
-                if (hack_count is None):
-                    categories[hack] = 1
+            for category in article_categories:
+                category_count = categories.get(category)
+                if (category_count is None):
+                    categories[category] = 1
                 else:
-                    categories[hack] = hack_count + 1
+                    categories[category] = category_count + 1
+            
+            # update our backlinks so we can see the articles that each hack category was inferred from
+            for category in article_categories:
+                article_url = get_article_url(filepath)
+                article_urls_for_category = backlinks.get(category)
+                                
+                # to be extra sure, check to make sure we don't have any duplicate
+                # categories for a given hack. An AssertionError here would mean
+                # that GPT is creating category arrays with duplicate categories
+                # which we don't want
+                if article_url in article_urls_for_category:
+                    raise AssertionError(f"Duplicate category for article {article_url} and category {category}")
+
+                # update backlinks
+                if article_urls_for_category is None:
+                    backlinks[category] = [article_url]
+                else:
+                    backlinks[category].append(article_url)
 
             # sleep for 10 seconds to avoid hitting the API rate limit
             # This calculation is based on an average of 24.5 tokens per minute
@@ -199,17 +230,15 @@ def main(urls):
     print("CATEGORIES:")
     print(categories)
 
-    # TODO
-    # (categories, backlinks) = categorize_markdowns_with_backlinks(markdowns)
+    print("BACKLINKS:")
+    print(backlinks)
 
-    # print("CATEGORIES:")
-    # print(categories)
-    # print("BACKLINKS:")
-    # print(backlinks)
+    result = {
+        categories: categories,
+        backlinks: backlinks
+    }
+
+    print(result)
 
 if __name__ == "__main__":
-    urls = [
-        "https://rekt.news/merlin-dex-rekt/",
-        # Add more URLs if needed
-    ]
-    main(urls)
+    main()

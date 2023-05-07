@@ -1,7 +1,6 @@
 import os
 import openai
 import ast
-import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -219,14 +218,14 @@ END
 ---
 """
 
-def summarize(markdown, old_categories):
+def infer_categories_from_article(markdown, old_categories):
 
+    # infer categories for this article from OpenAI API
     prompt = prompt_prefix.format(markdown=markdown, old_categories=old_categories)
     resp = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[{"role": "user", "content": prompt}],
     )
-
     if not resp.choices or len(resp.choices) != 1:
         print(f"ERROR: {resp}")
         raise Exception("unexpected response from OpenAI API")
@@ -236,5 +235,7 @@ def summarize(markdown, old_categories):
     new_categories = ast.literal_eval(categories_as_string)
     if new_categories is None:
         raise Exception(f"unable to parse categories string {categories_as_string}")
+    if len(new_categories) != len(set(new_categories)):
+        raise Exception(f"categories {new_categories} contain duplicates")
 
     return new_categories

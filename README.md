@@ -9,7 +9,11 @@ Awesome rekt_summarizer created by Melvillian
 ## Installation
 
 ```bash
+# install deps
 pip install -r requirements.txt
+
+# set your OPENAI API key you'll use for inference
+`echo "OPENAI_API_KEY=sk-YOUR_KEY" > .env`
 ```
 
 ## Usage
@@ -23,7 +27,7 @@ $ rekt_summarizer
 This will:
 1. Fetch the rekt.news articles listed in their [leaderboard](https://rekt.news/leaderboard/)
 2. Convert the HTML articles to markdown and store them in [rekt_summarizer/markdown_data/](./rekt_summarizer/markdown_data/)
-3. Use OpenAI to categorize the hacks involved in each article such the tool outputs a JSON object of the form:
+3. Use OpenAI to categorize the hacks involved in each article such the script prints a dict of the form:
 
 
 ```js
