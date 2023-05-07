@@ -10,7 +10,7 @@ from .categorizer import summarize  # pragma: no cover
 
 REKT_NEWS_BASE_URL = "https://rekt.news"
 REKT_NEWS_PAGINATION_URL = "https://rekt.news/?page={index}"
-MARKDOWN_DIRECTORY = "rekt_summarizer/markdown_data/29_04_2023"
+MARKDOWN_DIRECTORY = "rekt_summarizer/markdown_data"
 
 def fetch_html(url):
     try:
