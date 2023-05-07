@@ -1,9 +1,6 @@
 
 # rekt_summarizer
 
-[![codecov](https://codecov.io/gh/Melvillian/rekt_summarizer/branch/main/graph/badge.svg?token=rekt_summarizer_token_here)](https://codecov.io/gh/Melvillian/rekt_summarizer)
-[![CI](https://github.com/Melvillian/rekt_summarizer/actions/workflows/main.yml/badge.svg)](https://github.com/Melvillian/rekt_summarizer/actions/workflows/main.yml)
-
 Awesome rekt_summarizer created by Melvillian
 
 ## Installation
