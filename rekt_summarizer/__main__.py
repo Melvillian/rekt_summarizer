@@ -1,6 +1,6 @@
 """Entry point for rekt_summarizer."""
 
-from .cli import main  # pragma: no cover
+from .base import main
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     main()

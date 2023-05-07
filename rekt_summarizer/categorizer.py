@@ -1,7 +1,6 @@
 import os
 import openai
 import ast
-import requests
 import time
 
 from dotenv import load_dotenv
@@ -239,7 +238,7 @@ def infer_categories_from_article(markdown, old_categories):
                 messages=[{"role": "user", "content": prompt}],
             )
             break
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             print(f"OPENAI Error: {e}")
             time.sleep(20)
             counter = counter + 1
