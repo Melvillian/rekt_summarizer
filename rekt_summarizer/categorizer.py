@@ -1,6 +1,7 @@
 import os
 import openai
 import ast
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -217,9 +218,10 @@ END
 
 def summarize(markdown):
 
+    prompt = prompt_prefix.format(markdown=markdown)
     resp = openai.ChatCompletion.create(
         model="gpt-4",
-        messages=[{"role": "user", "content": prompt_prefix.format(markdown=markdown)}],
+        messages=[{"role": "user", "content": prompt}],
     )
 
     if not resp.choices or len(resp.choices) != 1:
@@ -229,5 +231,7 @@ def summarize(markdown):
     # convert string ["rugpull"] to an actual Python list
     categories_as_string = resp.choices[0].message.content
     categories = ast.literal_eval(categories_as_string)
+    if categories is None:
+        raise Exception(f"unable to parse categories string {categories_as_string}")
 
     return categories

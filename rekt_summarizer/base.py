@@ -170,13 +170,40 @@ def main(urls):
     # gather filepaths and loop through summarizing them
     markdown_filepaths = glob.glob(os.path.join(MARKDOWN_DIRECTORY, "*.md"))
 
+    # stores the number of hacks for each category
+    # e.g.: { "human_error": 5, "rugpull": 2 }
+    categories = {}
+
     for filepath in markdown_filepaths:
         with open(filepath, "r") as file:
             markdown = file.read()
 
             print(filepath)
-            summarize(markdown)
-            break
+            hacks_for_this_category = summarize(markdown)
+
+            print("Hack categories for this article:")
+            print(hacks_for_this_category)
+
+            print("BEFORE:")
+            print(categories)
+
+            # this article had some hacks, let's update the category dict by incrementing
+            # the count for each hack
+            for hack in hacks_for_this_category:
+                hack_count = categories.get(hack)
+                if (hack_count is None):
+                    categories[hack] = 1
+                else:
+                    categories[hack] = hack_count + 1
+
+            print("AFTER:")
+            print(categories)
+
+                
+            # sleep for 10 seconds to avoid hitting the API rate limit
+            # This calculation is based on an average of 24.5 tokens per minute
+            # and the rate limit is 40k tokens per minute
+            time.sleep(10)
 
 
     
