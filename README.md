@@ -1,7 +1,9 @@
 
 # rekt_summarizer
 
-Awesome rekt_summarizer created by Melvillian
+A python script that uses the [rekt.news leaderboard](https://rekt.news/leaderboard/) and GPT-4 to categorize the hacks for all protocols on the leaderboard
+
+![frontend](./histogram.png)
 
 ## Installation
 
